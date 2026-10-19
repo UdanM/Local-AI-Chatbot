@@ -141,37 +141,26 @@ class Chatbot:
         if not extracted:
             return
 
+        
         for key, value in extracted.items():
             if value is None or value == "":
                 continue
 
             existing_value = self.memory.get(key)
 
-            if key == "field" and existing_value is not None:
-                if not isinstance(existing_value, list):
-                    existing_value = [existing_value]
-
+            if key == "field":
                 if not isinstance(value, list):
                     value = [value]
+
+                if existing_value is None:
+                    existing_value = []
+                elif not isinstance(existing_value, list):
+                    existing_value = [existing_value]
 
                 for item in value:
                     if item not in existing_value:
                         existing_value.append(item)
 
                 value = existing_value
-
-            elif isinstance(value, list):
-                if isinstance(existing_value, list):
-                    for item in value:
-                        if item not in existing_value:
-                            existing_value.append(item)
-
-                    value = existing_value
-
-                elif existing_value is not None:
-                    value = [existing_value] + [
-                        item for item in value
-                        if item != existing_value
-                    ]
 
             self.memory.set(key, value)
