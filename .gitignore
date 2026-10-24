@@ -3,3 +3,4 @@ __pycache__/
 .env
 conversation.json
 memory.json
+vector_store.json

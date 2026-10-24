@@ -1,8 +1,10 @@
-from config import ollama_url, ollama_model, system_prompt
+from config import ollama_url, ollama_model, system_prompt,embedding_model
 from ollama_client import OllamaClient
 from chatbot import Chatbot
 from storage import ConversationStorage
 from memory import Memory
+from pathlib import Path
+from embeddings import EmbeddingClient
 import requests
 import json
 
@@ -10,7 +12,17 @@ client = OllamaClient(ollama_url, ollama_model)
 storage = ConversationStorage("conversation.json")
 memory = Memory("memory.json")
 
-chatbot = Chatbot(client, storage, memory, system_prompt)
+store_path = Path("vector_store.json")
+indexed_chunks = json.loads(
+    store_path.read_text(encoding="utf-8")
+)
+
+embedding_client = EmbeddingClient(
+    url=ollama_url,
+    model=embedding_model
+)
+
+chatbot = Chatbot(client, storage, memory, system_prompt, embedding_client, indexed_chunks)
 
 while True:
     question = input("\nYou: ")
@@ -85,3 +97,19 @@ while True:
 
 
     print()
+
+    
+    if chatbot.last_sources:
+        print("\nSources and supporting excerpts:")
+
+        displayed_sources = set()
+
+        for source in chatbot.last_sources:
+            filename = source["source"]
+
+            if filename not in displayed_sources:
+                displayed_sources.add(filename)
+
+                print(f"\n- {filename}")
+                print(f"  Similarity: {source['score']:.4f}")
+                print(f"  Excerpt: {source['text']}")
