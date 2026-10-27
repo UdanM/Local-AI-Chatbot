@@ -5,6 +5,7 @@ from storage import ConversationStorage
 from memory import Memory
 from pathlib import Path
 from embeddings import EmbeddingClient
+from vector_store import VectorStore
 import requests
 import json
 
@@ -12,17 +13,14 @@ client = OllamaClient(ollama_url, ollama_model)
 storage = ConversationStorage("conversation.json")
 memory = Memory("memory.json")
 
-store_path = Path("vector_store.json")
-indexed_chunks = json.loads(
-    store_path.read_text(encoding="utf-8")
-)
+vector_store = VectorStore()
 
 embedding_client = EmbeddingClient(
     url=ollama_url,
     model=embedding_model
 )
 
-chatbot = Chatbot(client, storage, memory, system_prompt, embedding_client, indexed_chunks)
+chatbot = Chatbot(client, storage, memory, system_prompt, embedding_client, vector_store)
 
 while True:
     question = input("\nYou: ")

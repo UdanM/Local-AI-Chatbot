@@ -4,3 +4,4 @@ __pycache__/
 conversation.json
 memory.json
 vector_store.json
+chroma_db

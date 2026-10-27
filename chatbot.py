@@ -1,7 +1,6 @@
 from storage import ConversationStorage
 from memory import Memory
 from retrieval import retrieve_chunks
-from embeddings import EmbeddingClient
 import json
 
 MAX_MESSAGES = 10
@@ -16,14 +15,14 @@ class Chatbot:
         memory,
         system_prompt,
         embedding_client,
-        indexed_chunks
+        vectore_store
     ):
         self.client = client
         self.storage = storage
         self.memory = memory
         self.system_prompt = system_prompt
         self.embedding_client = embedding_client
-        self.indexed_chunks = indexed_chunks
+        self.vector_store = vectore_store
         self.last_sources = []
 
         self.messages = self.storage.load()
@@ -57,8 +56,8 @@ class Chatbot:
 
         results = retrieve_chunks(  # Retrieve relevant document chunks.
             question=question,
-            indexed_chunks=self.indexed_chunks,
             client=self.embedding_client,
+            vector_store=self.vector_store,
             top_k=3
             )
         
